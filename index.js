@@ -59,6 +59,14 @@ async function openSettings() {
     })
     settingsWin.loadURL(`file://${__dirname}/static/settings.html`)
 
+    settingsWin.webContents.on('dom-ready', async () => {
+        console.log('ready!')
+        settingsWin.webContents.send('mailcord:init', await settings.get('mailcord'));
+        settingsWin.moveTop();
+        settingsWin.show();
+        if (process.platform === 'darwin') app.dock.show();
+      });
+
     settingsWin.on('closed', () => {
         settingsWin = null
     })   
@@ -117,10 +125,6 @@ async function startup() {
     })
 }
 
-module.exports = {
-    setup: setupWin,
-    settings: settingsWin
-}
 
 
 // process.platform === 'darwin' (mac)
