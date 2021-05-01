@@ -102,7 +102,7 @@ async function startup() {
             settings.set(`mailcord[${index}].last`, mail)
             
             phin({
-                url: 'https://discordapp.com/api/webhooks/579331910744932363/mrDHjsz7oQdAzyW0mvX-Ei-9JBGjjue1XTKpm_7Nk1NiZYFbLfyL0bWLmpKN4_67MdHj',
+                url: account.webhook,
                 method: 'POST',
                 data: {
                     'embeds': [
