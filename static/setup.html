@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>Mailcord - Setup</title>
+	<link rel="stylesheet" href="style.css" />
+	<link href="https://fonts.googleapis.com/css?family=Quicksand:300,500,800" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+</head>
+
+<body>
+	<div class="container">
+		<h1 class="title">Welcome to Mailcord</h1>
+		<div id="error"></div>
+		<div id="page1">
+			<span class="label">User</span>
+			<input type="email" name="email" id="email" placeholder="hello@world.com" required>
+			<span class="label">Password</span>
+			<div class="pass">
+				<input type="password" name="password" id="password" style="margin-bottom: 30px;" required>
+				<i class="far fa-eye" id="togglePassword"></i>
+			</div>
+			<a id="btn1" class="button">Continue</a>
+		</div>
+		<div id="page2">
+			<span class="label">Host</span>
+			<input name="host" id="host" placeholder="imap.gmail.com" required>
+			<span class="label">Port</span>
+			<input name="port" id="port" placeholder="993" required>
+			<span class="label">Mark seen</span>
+			<input type="checkbox" name="seen" id="seen">
+			<span class="label">Discord webhook link</span>
+			<input name="webhook" id="webhook" placeholder="https://discord.com/api/webhooks/000000000000000000/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" required>
+			<hr>
+			<span class="label">Email Label</span>
+			<input name="webhook" id="code" placeholder="Gmail [Main]" style="margin-bottom: 30px;" required>
+			<div class="inline-btn">
+				<a id="btn2" class="button">Back</a> <a id="btn3" class="button">Finish Setup</a>
+			</div>
+		</div>
+	</div>
+	<script src="setup.js"></script>
+</body>
+
+</html>

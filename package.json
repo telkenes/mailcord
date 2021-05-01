@@ -1,0 +1,28 @@
+{
+  "name": "mailcord",
+  "version": "0.0.1",
+  "description": "A simple mail client that sends emails to a discord channel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "linux": "electron-packager . mailcord --overwrite --asar --platform=linux --arch=x64 --icon=assets/icons/icon512.png --prune=true --out=release-builds"
+  },
+  "keywords": [
+    "discord",
+    "mail"
+  ],
+  "author": "Telk",
+  "license": "MIT",
+  "dependencies": {
+    "auto-launch": "^5.0.5",
+    "crypto-js": "^4.0.0",
+    "electron-settings": "^4.0.2",
+    "h2m": "^0.7.0",
+    "mail-notifier": "^0.5.0",
+    "phin": "^3.5.1"
+  },
+  "devDependencies": {
+    "electron": "^12.0.6"
+  }
+}

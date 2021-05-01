@@ -1,0 +1,82 @@
+body {
+    background-color: #36393F;
+    font-family: "Quicksand", sans-serif;
+}
+
+.container {
+    align-items: center;
+    width: 80vw;
+    margin: auto;
+}
+
+.title {
+    text-align: center;
+    color: #ffffff;
+}
+
+.button {
+    color: #010101;
+    padding: 10px;
+    background-color: #d4bfff;
+    border-radius: 5px;
+}
+
+.button:hover {
+    cursor: pointer;
+}
+
+#c1 {
+    margin-top: 10px;
+    width: 80vw;
+}
+
+.label {
+    color: #ffffff;
+    margin-bottom: 10px;
+    display: block;
+    font-size: 25px;
+    font-weight: 500;
+}
+
+input {
+    border: none;
+    background-color: #ffffff;
+    border-radius: 5px;
+    padding: 10px;
+    display: block;
+    width: 100%;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+input[type="checkbox"] {
+    position: absolute;
+    margin-top: -30px;
+    margin-left: -150px;
+}
+
+
+.pass i {
+    position: absolute;
+    margin-top: -55px;
+    right: 10%;
+    cursor: pointer;
+}
+
+#page2 {
+    opacity: 0;
+    transition: 1s;
+    display: none;
+}
+
+.error.danger {
+    margin-top: 30px;
+    min-width: 100%;
+    background-color: rgb(241, 70, 104, 0.5);
+    color: #ffffff;
+    border-color: rgb(241, 70, 104);
+    border-width: 3px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 10px;
+}
