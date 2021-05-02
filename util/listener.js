@@ -1,3 +1,5 @@
+const { ipcMain } = require("electron")
+
 module.exports = {
     setup: async (settings, setupWin, e, config) => {
         let emails = [
@@ -36,5 +38,6 @@ module.exports = {
 
         let newsettings = conf.slice(index, 1)
         await settings.set('mailcord', newsettings)
+        ipcMain.send('mailcord:init', newsettings)
     }
 }

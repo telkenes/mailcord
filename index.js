@@ -2,7 +2,7 @@ const { app, Menu, Tray, BrowserWindow, globalShortcut, clipboard, ipcMain, nati
 const crypto = require('crypto-js')
 const phin = require('phin')
 const settings = require('electron-settings');
-
+const fs = require('fs')
 //window variables
 let settingsWin = null
 let setupWin = null
@@ -60,7 +60,6 @@ async function openSettings() {
     settingsWin.loadURL(`file://${__dirname}/static/settings.html`)
 
     settingsWin.webContents.on('dom-ready', async () => {
-        console.log('ready!')
         settingsWin.webContents.send('mailcord:init', await settings.get('mailcord'));
         settingsWin.moveTop();
         settingsWin.show();
@@ -91,12 +90,16 @@ async function startup() {
             host: account.host,
             port: account.port,
             tls: true,
-            tlsOptions: { rejectUnauthorized: TouchBarLabel },
+            tlsOptions: { rejectUnauthorized: false },
+            cert: fs.readFileSync('cacert.pem'),
+            requestCert: true,
             markSeen: account.seen
         }
 
         let notifier = n(info)
-        notifier.on('connected', () => { })
+        notifier.on('connected', () => {
+            console.log('connected')
+        })
         notifier.on('mail', async (mail) => {
             let embed = {
                 'title': `New Email (${account.code}) | From **${mail.from[0].name}** (${mail.from[0].address})`,
@@ -107,8 +110,6 @@ async function startup() {
             let lastemail = account.last
             if (lastemail.text === mail.text) return
             if (new Date(lastemail.receivedDate).getTime() >= new Date(mail.receivedDate).getTime()) return
-            settings.set(`mailcord[${index}].last`, mail)
-            
             phin({
                 url: account.webhook,
                 method: 'POST',

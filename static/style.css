@@ -1,6 +1,8 @@
 body {
     background-color: #36393F;
     font-family: "Quicksand", sans-serif;
+    overflow: scroll;
+    overflow-x: hidden;
 }
 
 .container {
@@ -79,4 +81,19 @@ input[type="checkbox"] {
     border-style: solid;
     border-radius: 5px;
     padding: 10px;
+}
+
+.accbutton {
+    cursor: pointer;
+}
+.accbutton::after {
+    border-bottom: 5px #ffffff solid;
+}
+
+.acc {
+    display: none;
+}
+
+.acc.visible {
+    display: block;
 }
