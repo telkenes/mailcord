@@ -13,7 +13,6 @@ let showError = (message) => {
 ipcRenderer.on('mailcord:init', (e, accounts) => {
     console.log(accounts)
     let acc = []
-
     accounts.forEach((account, i) => {
         acc.push(`
             <div id="acc${i}" class="accbutton">
@@ -61,4 +60,41 @@ function del(element) {
     let i = Number(element.id.replace('del', ''))
     console.log(i)
     ipcRenderer.send('mailcord:remove', i)
+}
+
+document.getElementById('add').onclick = async () => {
+    let i = document.querySelectorAll('.acc').length;
+    console.log(i)
+    let newacc = `
+    <div id="acc${i}" class="accbutton">
+    <span class="label" onclick="document.getElementById('account${i}').classList.toggle('visible');">-- New Mail -- 
+    <i class="fas fa-angle-down" aria-hidden="true"></i>
+    </span>
+    </div>
+    <div id="account${i}" class="acc">
+        <span class="label">User</span>
+        <input type="email" name="email" id="email" placeholder="hello@world.com">
+        <span class="label">Password</span>
+        <div class="pass">
+            <input type="password" name="password" id="password" style="margin-bottom: 30px;">
+            <i class="far fa-eye" id="togglePassword"></i>
+        </div>
+        <span class="label">Host</span>
+        <input name="host" id="host" placeholder="imap.gmail.com">
+        <span class="label">Port</span>
+        <input name="port" id="port" placeholder="993">
+        <span class="label">Mark seen</span>
+        <input type="checkbox" name="seen" id="seen">
+        <span class="label">Discord webhook link</span>
+        <input name="webhook" id="webhook" placeholder="https://discord.com/api/webhooks/000000000000000000/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+        <hr>
+        <span class="label">Email Label</span>
+        <input name="webhook" id="code" placeholder="Gmail [Main]" style="margin-bottom: 30px;">
+        <div class="inline-btn" style="margin-bottom: 30px;">
+            <a id="s${i}" class="button" onclick="save(this)">Save</a> <a id="del${i}" class="button" onclick="del(this)">Delete</a>
+        </div>
+    </div>
+    `
+    let accs = document.getElementById('accounts').innerHTML
+    document.getElementById('accounts').innerHTML = accs + newacc
 }

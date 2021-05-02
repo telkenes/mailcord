@@ -60,15 +60,17 @@ async function openSettings() {
     settingsWin.loadURL(`file://${__dirname}/static/settings.html`)
 
     settingsWin.webContents.on('dom-ready', async () => {
+        console.log('ready')
         settingsWin.webContents.send('mailcord:init', await settings.get('mailcord'));
         settingsWin.moveTop();
         settingsWin.show();
         if (process.platform === 'darwin') app.dock.show();
-      });
+    });
 
     settingsWin.on('closed', () => {
         settingsWin = null
-    })   
+    })
+    ipcMain.on('mailcord:remove', (...args) => require('./util/listener.js').remove(settings, settingsWin, ...args))
 }
 
 const n = require('mail-notifier')
@@ -77,10 +79,10 @@ async function startup() {
     tray = new Tray(__dirname + '/assets/icons/icon512.png')
     tray.setToolTip('Mailcord')
     const contextMenu = Menu.buildFromTemplate([
-        { label: 'Open Settings', click: openSettings},
-        { type: 'separator'},
+        { label: 'Open Settings', click: openSettings },
+        { type: 'separator' },
         { label: 'Quit', role: 'quit' }
-      ])
+    ])
     tray.setContextMenu(contextMenu)
     let conf = await settings.get('mailcord')
     conf.forEach((account, index) => {
@@ -121,7 +123,10 @@ async function startup() {
             })
         })
         notifier.on('end', () => notifier.start())
-        notifier.on('error', (e) => console.log(e))
+        notifier.on('error', (e) => {
+            console.log('==================')
+            console.log(e)
+        })
         notifier.start()
     })
 }

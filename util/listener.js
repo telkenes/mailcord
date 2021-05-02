@@ -33,11 +33,13 @@ module.exports = {
         await settings.set('mailcord', newsettings)
     },
 
-    remove: async (settings, e, index) => {
+    remove: async (settings, settingsWin, e, index) => {
+        console.log('listener go brrr')
         let conf = await settings.get('mailcord')
 
-        let newsettings = conf.slice(index, 1)
-        await settings.set('mailcord', newsettings)
-        ipcMain.send('mailcord:init', newsettings)
+        conf.splice(index, 1)
+        console.log(conf)
+        await settings.set('mailcord', conf)
+        settingsWin.webContents.send('mailcord:init', conf)
     }
 }
