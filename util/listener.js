@@ -17,10 +17,10 @@ module.exports = {
         await settings.set('mailcord', emails)
         setupWin.close()
     },
-    add: async (settings, e, config) => {
+    add: async (settings, settingsWin, e, config) => {
         let conf = await settings.get('mailcord')
 
-        let newsettings = conf.push({
+        conf.push({
             email: config.email,
             password: config.password,
             host: config.host,
@@ -30,15 +30,36 @@ module.exports = {
             webhook: config.webhook,
             last: {}
         })
-        await settings.set('mailcord', newsettings)
+        await settings.set('mailcord', conf)
+        settingsWin.webContents.send('mailcord:init', conf)
     },
+    edit: async (settings, settingsWin, e, config) => {
+        /*
+            should receive data
+            {
+                i, email, password, host, port, seen, code, webhook
+            }
+        */
 
+        let conf = await settings.get('mailcord')
+
+        conf[config.i] = {
+            email: config.email,
+            password: config.password,
+            host: config.host,
+            port: config.port,
+            seen: config.seen,
+            code: config.code,
+            webhook: config.webhook,
+            last: {}
+        }
+        await settings.set('mailcord', conf)    
+        settingsWin.webContents.send('mailcord:init', conf)
+    },
     remove: async (settings, settingsWin, e, index) => {
-        console.log('listener go brrr')
         let conf = await settings.get('mailcord')
 
         conf.splice(index, 1)
-        console.log(conf)
         await settings.set('mailcord', conf)
         settingsWin.webContents.send('mailcord:init', conf)
     }

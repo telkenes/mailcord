@@ -11,7 +11,6 @@ let showError = (message) => {
 }
 
 ipcRenderer.on('mailcord:init', (e, accounts) => {
-    console.log(accounts)
     let acc = []
     accounts.forEach((account, i) => {
         acc.push(`
@@ -26,7 +25,7 @@ ipcRenderer.on('mailcord:init', (e, accounts) => {
 			    <span class="label">Password</span>
 			    <div class="pass">
 				    <input type="password" name="password" id="password" style="margin-bottom: 30px;" value="${account.password}">
-				    <i class="far fa-eye" id="togglePassword"></i>
+				    <i class="far fa-eye" id="togglePassword" onclick="toggle()"></i>
 			    </div>
                 <span class="label">Host</span>
                 <input name="host" id="host" placeholder="imap.gmail.com" value="${account.host}">
@@ -39,7 +38,7 @@ ipcRenderer.on('mailcord:init', (e, accounts) => {
                 <hr>
                 <span class="label">Email Label</span>
                 <input name="webhook" id="code" placeholder="Gmail [Main]" style="margin-bottom: 30px;" value="${account.code}">
-                <div class="inline-btn">
+                <div class="inline-btn" style="margin-bottom: 30px;">
 				    <a id="s${i}" class="button" onclick="save(this)">Save</a> <a id="del${i}" class="button" onclick="del(this)">Delete</a>
 			    </div>
             </div>
@@ -49,27 +48,55 @@ ipcRenderer.on('mailcord:init', (e, accounts) => {
     document.getElementById('accounts').innerHTML = acc.join("\n")
 })
 
+function toggle() {
+    const password = document.querySelector('#password');
+    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+    password.setAttribute('type', type);
+    this.classList.toggle('fa-eye-slash');
+}
+
 function save(element) {
     let i = Number(element.id.replace('s', ''))
-    console.log(i)
+
+    let newEmail = document.querySelector(`div#acc${i} span`).innerHTML === '-- New Mail --<i class="fas fa-angle-down" aria-hidden="true"></i>' ? true : false
     let email = document.querySelector(`div#account${i} #email`).value
-    console.log(email)
+    let password = document.querySelector(`div#account${i} #password`).value
+    let host = document.querySelector(`div#account${i} #host`).value
+    let port = document.querySelector(`div#account${i} #port`).value
+    let seen = document.querySelector(`div#account${i} #seen`).checked
+    let code = document.querySelector(`div#account${i} #code`).value
+    let webhook = document.querySelector(`div#account${i} #webhook`).value
+    if (!email || !password || !host || !port || !seen || !code || !webhook) return showError('Missing required fields')
+    let eRegex = /.*@.*\.[a-z]*/gm
+    if (!eRegex.test(email)) return showError('Email is not valid')
+    if (!webhook.startsWith('https://discord.com/api/webhooks/')) return showError('Invalid discord webhook url')
+    let data = {
+        email: email,
+        password: password,
+        host: host,
+        port: port,
+        seen: seen,
+        code: code,
+        webhook: webhook
+    }
+    if (!newEmail) {
+        data['i'] = i
+        ipcRenderer.send('mailcord:edit', data)
+    } else {
+        ipcRenderer.send('mailcord:add', data)
+    }
 }
 
 function del(element) {
     let i = Number(element.id.replace('del', ''))
-    console.log(i)
     ipcRenderer.send('mailcord:remove', i)
 }
 
 document.getElementById('add').onclick = async () => {
     let i = document.querySelectorAll('.acc').length;
-    console.log(i)
     let newacc = `
     <div id="acc${i}" class="accbutton">
-    <span class="label" onclick="document.getElementById('account${i}').classList.toggle('visible');">-- New Mail -- 
-    <i class="fas fa-angle-down" aria-hidden="true"></i>
-    </span>
+    <span class="label" onclick="document.getElementById('account${i}').classList.toggle('visible');">-- New Mail --<i class="fas fa-angle-down" aria-hidden="true"></i></span>
     </div>
     <div id="account${i}" class="acc">
         <span class="label">User</span>
@@ -97,4 +124,17 @@ document.getElementById('add').onclick = async () => {
     `
     let accs = document.getElementById('accounts').innerHTML
     document.getElementById('accounts').innerHTML = accs + newacc
+}
+
+
+let decreaseOp = (id, decrease, interval, func) => {
+    let op = 1
+    let changeop = setInterval(() => {
+        op -= decrease
+        if (op < 0.1) {
+            func()
+            clearInterval(changeop)
+        }
+        document.getElementById(id).style.opacity = op
+    }, interval)
 }

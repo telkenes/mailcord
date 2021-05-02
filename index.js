@@ -8,6 +8,8 @@ let settingsWin = null
 let setupWin = null
 let tray = null
 
+let listeners = {}
+
 const template = require('./util/template.js');
 
 app.on('ready', async (event) => {
@@ -40,7 +42,7 @@ async function openSetup() {
         if (!config) app.quit()
         else startup()
     })
-    ipcMain.on('mailcord:setup', (...args) => require('./util/listener.js').setup(settings, setupWin, ...args))
+    if (!listeners.setup) listeners.setup = ipcMain.on('mailcord:setup', (...args) => require('./util/listener.js').setup(settings, setupWin, ...args))
 }
 
 async function openSettings() {
@@ -60,7 +62,6 @@ async function openSettings() {
     settingsWin.loadURL(`file://${__dirname}/static/settings.html`)
 
     settingsWin.webContents.on('dom-ready', async () => {
-        console.log('ready')
         settingsWin.webContents.send('mailcord:init', await settings.get('mailcord'));
         settingsWin.moveTop();
         settingsWin.show();
@@ -70,7 +71,10 @@ async function openSettings() {
     settingsWin.on('closed', () => {
         settingsWin = null
     })
-    ipcMain.on('mailcord:remove', (...args) => require('./util/listener.js').remove(settings, settingsWin, ...args))
+    if (!listeners.remove) listeners.remove = ipcMain.on('mailcord:remove', (...args) => require('./util/listener.js').remove(settings, settingsWin, ...args))
+    if (!listeners.add) listeners.add = ipcMain.on('mailcord:add', (...args) => require('./util/listener.js').add(settings, settingsWin, ...args))
+    if (!listeners.edit) listeners.edit = ipcMain.on('mailcord:edit', (...args) => require('./util/listener.js').edit(settings, settingsWin, ...args))
+
 }
 
 const n = require('mail-notifier')
@@ -100,7 +104,7 @@ async function startup() {
 
         let notifier = n(info)
         notifier.on('connected', () => {
-            console.log('connected')
+            console.log(`Notifier for ${account.email} has successfully connected`)
         })
         notifier.on('mail', async (mail) => {
             let embed = {
@@ -124,7 +128,6 @@ async function startup() {
         })
         notifier.on('end', () => notifier.start())
         notifier.on('error', (e) => {
-            console.log('==================')
             console.log(e)
         })
         notifier.start()
