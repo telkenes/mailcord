@@ -17,7 +17,7 @@ module.exports = {
         await settings.set('mailcord', emails)
         setupWin.close()
     },
-    add: async (settings, settingsWin, e, config) => {
+    add: async (settings, settingsWin, startNotifier, e, config) => {
         let conf = await settings.get('mailcord')
 
         conf.push({
@@ -32,8 +32,9 @@ module.exports = {
         })
         await settings.set('mailcord', conf)
         settingsWin.webContents.send('mailcord:init', conf)
+        startNotifier(conf)
     },
-    edit: async (settings, settingsWin, e, config) => {
+    edit: async (settings, settingsWin, startNotifier, e, config) => {
         /*
             should receive data
             {
@@ -55,12 +56,14 @@ module.exports = {
         }
         await settings.set('mailcord', conf)    
         settingsWin.webContents.send('mailcord:init', conf)
+        startNotifier(conf)
     },
-    remove: async (settings, settingsWin, e, index) => {
+    remove: async (settings, settingsWin, startNotifier,  e, index) => {
         let conf = await settings.get('mailcord')
 
         conf.splice(index, 1)
         await settings.set('mailcord', conf)
         settingsWin.webContents.send('mailcord:init', conf)
+        startNotifier(conf)
     }
 }

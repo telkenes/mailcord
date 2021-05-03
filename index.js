@@ -71,13 +71,14 @@ async function openSettings() {
     settingsWin.on('closed', () => {
         settingsWin = null
     })
-    if (!listeners.remove) listeners.remove = ipcMain.on('mailcord:remove', (...args) => require('./util/listener.js').remove(settings, settingsWin, ...args))
-    if (!listeners.add) listeners.add = ipcMain.on('mailcord:add', (...args) => require('./util/listener.js').add(settings, settingsWin, ...args))
-    if (!listeners.edit) listeners.edit = ipcMain.on('mailcord:edit', (...args) => require('./util/listener.js').edit(settings, settingsWin, ...args))
+    if (!listeners.remove) listeners.remove = ipcMain.on('mailcord:remove', (...args) => require('./util/listener.js').remove(settings, settingsWin, startNotifier, ...args))
+    if (!listeners.add) listeners.add = ipcMain.on('mailcord:add', (...args) => require('./util/listener.js').add(settings, settingsWin, startNotifier, ...args))
+    if (!listeners.edit) listeners.edit = ipcMain.on('mailcord:edit', (...args) => require('./util/listener.js').edit(settings, settingsWin, startNotifier, ...args))
 
 }
 
 const n = require('mail-notifier')
+let accs = {}
 async function startup() {
     openSettings()
     tray = new Tray(__dirname + '/assets/icons/icon512.png')
@@ -89,7 +90,15 @@ async function startup() {
     ])
     tray.setContextMenu(contextMenu)
     let conf = await settings.get('mailcord')
-    conf.forEach((account, index) => {
+    startNotifier(conf)
+}
+
+async function startNotifier(accounts) {
+    Object.keys(accs).forEach(key => {
+        accs[key].stop()
+    })
+
+    accounts.forEach((account, index) => {
         let info = {
             user: account.email,
             password: account.password,
@@ -102,11 +111,11 @@ async function startup() {
             markSeen: account.seen
         }
 
-        let notifier = n(info)
-        notifier.on('connected', () => {
+        accs[account.email] = n(info)
+        accs[account.email].on('connected', () => {
             console.log(`Notifier for ${account.email} has successfully connected`)
         })
-        notifier.on('mail', async (mail) => {
+        accs[account.email].on('mail', async (mail) => {
             let embed = {
                 'title': `New Email (${account.code}) | From **${mail.from[0].name}** (${mail.from[0].address})`,
                 'url': `https://mail.google.com/mail/`,
@@ -126,14 +135,13 @@ async function startup() {
                 }
             })
         })
-        notifier.on('end', () => notifier.start())
-        notifier.on('error', (e) => {
+        //accs[account.email].on('end', () => accs[account.email].start())
+        accs[account.email].on('error', (e) => {
             console.log(e)
         })
-        notifier.start()
+        accs[account.email].start()
     })
 }
-
 
 
 // process.platform === 'darwin' (mac)
