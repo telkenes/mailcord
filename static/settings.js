@@ -10,13 +10,22 @@ let showError = (message) => {
     }, 2000)
 }
 
-ipcRenderer.on('mailcord:init', (e, accounts) => {
+ipcRenderer.on('mailcord:status', (e, email, status) => {
+    document.getElementById(email).innerHTML = status ? `<i class="fa fa-check" aria-hidden="true"></i>` : `<i class="fa fa-times" aria-hidden="true"></i>`
+})
+
+ipcRenderer.on('mailcord:init', (e, accounts, accs) => {
     let acc = []
     accounts.forEach((account, i) => {
         acc.push(`
             <div id="acc${i}" class="accbutton">
             <span class="label" onclick="document.getElementById('account${i}').classList.toggle('visible');">${account.email} 
             <i class="fas fa-angle-down" aria-hidden="true"></i>
+            <div id="${account.email}" class="status">
+            ${ accs[account.email].status === 'unknown' ? `<i class="fas fa-circle-notch fa-spin"></i>`
+                : accs[account.email].status === true ? `<i class="fa fa-check" aria-hidden="true"></i>` : `<i class="fa fa-times" aria-hidden="true"></i>`
+            }
+            </div>
             </span>
             </div>
             <div id="account${i}" class="acc">
@@ -24,8 +33,8 @@ ipcRenderer.on('mailcord:init', (e, accounts) => {
 			    <input type="email" name="email" id="email" placeholder="hello@world.com" value="${account.email}">
 			    <span class="label">Password</span>
 			    <div class="pass">
-				    <input type="password" name="password" id="password" style="margin-bottom: 30px;" value="${account.password}">
-				    <i class="far fa-eye" id="togglePassword" onclick="toggle()"></i>
+				    <input type="password" name="password" id="password${i}" style="margin-bottom: 30px;" value="${account.password}">
+				    <i class="far fa-eye" id="togglePassword" onclick="toggle(this, ${i})"></i>
 			    </div>
                 <span class="label">Host</span>
                 <input name="host" id="host" placeholder="imap.gmail.com" value="${account.host}">
@@ -48,11 +57,11 @@ ipcRenderer.on('mailcord:init', (e, accounts) => {
     document.getElementById('accounts').innerHTML = acc.join("\n")
 })
 
-function toggle() {
-    const password = document.querySelector('#password');
+function toggle(item, i) {
+    const password = document.querySelector('#password' + i);
     const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
     password.setAttribute('type', type);
-    this.classList.toggle('fa-eye-slash');
+    item.classList.toggle('fa-eye-slash');
 }
 
 function save(element) {

@@ -11,6 +11,7 @@ let tray = null
 let listeners = {}
 
 const template = require('./util/template.js');
+const { notif } = require('./util/notifications')
 
 app.on('ready', async (event) => {
     // await settings.unset('mailcord')
@@ -62,7 +63,7 @@ async function openSettings() {
     settingsWin.loadURL(`file://${__dirname}/static/settings.html`)
 
     settingsWin.webContents.on('dom-ready', async () => {
-        settingsWin.webContents.send('mailcord:init', await settings.get('mailcord'));
+        settingsWin.webContents.send('mailcord:init', await settings.get('mailcord'), adetails );
         settingsWin.moveTop();
         settingsWin.show();
         if (process.platform === 'darwin') app.dock.show();
@@ -71,14 +72,15 @@ async function openSettings() {
     settingsWin.on('closed', () => {
         settingsWin = null
     })
-    if (!listeners.remove) listeners.remove = ipcMain.on('mailcord:remove', (...args) => require('./util/listener.js').remove(settings, settingsWin, startNotifier, ...args))
-    if (!listeners.add) listeners.add = ipcMain.on('mailcord:add', (...args) => require('./util/listener.js').add(settings, settingsWin, startNotifier, ...args))
-    if (!listeners.edit) listeners.edit = ipcMain.on('mailcord:edit', (...args) => require('./util/listener.js').edit(settings, settingsWin, startNotifier, ...args))
+    if (!listeners.remove) listeners.remove = ipcMain.on('mailcord:remove', (...args) => require('./util/listener.js').remove(settings, settingsWin, startNotifier, adetails, ...args))
+    if (!listeners.add) listeners.add = ipcMain.on('mailcord:add', (...args) => require('./util/listener.js').add(settings, settingsWin, startNotifier, adetails, ...args))
+    if (!listeners.edit) listeners.edit = ipcMain.on('mailcord:edit', (...args) => require('./util/listener.js').edit(settings, settingsWin, startNotifier, adetails, ...args))
 
 }
 
 const n = require('mail-notifier')
 let accs = {}
+let adetails = {}
 async function startup() {
     openSettings()
     tray = new Tray(__dirname + '/assets/icons/icon512.png')
@@ -99,6 +101,8 @@ async function startNotifier(accounts) {
     })
 
     accounts.forEach((account, index) => {
+        adetails[account.email] = {}
+        adetails[account.email].status = 'unknown'
         let info = {
             user: account.email,
             password: account.password,
@@ -113,7 +117,9 @@ async function startNotifier(accounts) {
 
         accs[account.email] = n(info)
         accs[account.email].on('connected', () => {
-            console.log(`Notifier for ${account.email} has successfully connected`)
+            adetails[account.email].status = true
+            settingsWin.webContents.send('mailcord:status', account.email, true)
+            notif('Email Connected', `Notifier for ${account.email} has successfully connected`)
         })
         accs[account.email].on('mail', async (mail) => {
             let embed = {
@@ -137,7 +143,9 @@ async function startNotifier(accounts) {
         })
         //accs[account.email].on('end', () => accs[account.email].start())
         accs[account.email].on('error', (e) => {
-            console.log(e)
+            adetails[account.email].status = false
+            settingsWin.webContents.send('mailcord:status', account.email, false)
+            notif('Error', e.message)
         })
         accs[account.email].start()
     })

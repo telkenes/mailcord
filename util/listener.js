@@ -58,7 +58,7 @@ module.exports = {
         settingsWin.webContents.send('mailcord:init', conf)
         startNotifier(conf)
     },
-    remove: async (settings, settingsWin, startNotifier,  e, index) => {
+    remove: async (settings, settingsWin, startNotifier, e, index) => {
         let conf = await settings.get('mailcord')
 
         conf.splice(index, 1)
