@@ -22,7 +22,7 @@ ipcRenderer.on('mailcord:init', (e, accounts, accs) => {
             <span class="label" onclick="document.getElementById('account${i}').classList.toggle('visible');">${account.email} 
             <i class="fas fa-angle-down" aria-hidden="true"></i>
             <div id="${account.email}" class="status">
-            ${ accs[account.email].status === 'unknown' ? `<i class="fas fa-circle-notch fa-spin"></i>`
+            ${ !accs[account.email] ? '<i class="fas fa-circle-notch fa-spin"></i>' : accs[account.email].status === 'unknown' ? `<i class="fas fa-circle-notch fa-spin"></i>`
                 : accs[account.email].status === true ? `<i class="fa fa-check" aria-hidden="true"></i>` : `<i class="fa fa-times" aria-hidden="true"></i>`
             }
             </div>
@@ -69,7 +69,7 @@ function save(element) {
 
     let newEmail = document.querySelector(`div#acc${i} span`).innerHTML === '-- New Mail --<i class="fas fa-angle-down" aria-hidden="true"></i>' ? true : false
     let email = document.querySelector(`div#account${i} #email`).value
-    let password = document.querySelector(`div#account${i} #password`).value
+    let password = document.querySelector(`div#account${i} #password${i}`).value
     let host = document.querySelector(`div#account${i} #host`).value
     let port = document.querySelector(`div#account${i} #port`).value
     let seen = document.querySelector(`div#account${i} #seen`).checked
@@ -97,8 +97,8 @@ function save(element) {
 }
 
 function del(element) {
-    let i = Number(element.id.replace('del', ''))
-    ipcRenderer.send('mailcord:remove', i)
+    let itemNum = Number(element.id.replace('del', ''))
+    ipcRenderer.send('mailcord:remove', itemNum)
 }
 
 document.getElementById('add').onclick = async () => {
@@ -112,8 +112,8 @@ document.getElementById('add').onclick = async () => {
         <input type="email" name="email" id="email" placeholder="hello@world.com">
         <span class="label">Password</span>
         <div class="pass">
-            <input type="password" name="password" id="password" style="margin-bottom: 30px;">
-            <i class="far fa-eye" id="togglePassword"></i>
+            <input type="password" name="password" id="password${i}" style="margin-bottom: 30px;">
+            <i class="far fa-eye" id="togglePassword" onclick="toggle(this, ${i})"></i>
         </div>
         <span class="label">Host</span>
         <input name="host" id="host" placeholder="imap.gmail.com">

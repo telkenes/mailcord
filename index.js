@@ -110,8 +110,6 @@ async function startNotifier(accounts) {
             port: account.port,
             tls: true,
             tlsOptions: { rejectUnauthorized: false },
-            cert: fs.readFileSync('cacert.pem'),
-            requestCert: true,
             markSeen: account.seen
         }
 
