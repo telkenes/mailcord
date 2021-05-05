@@ -116,7 +116,7 @@ async function startNotifier(accounts) {
         accs[account.email] = n(info)
         accs[account.email].on('connected', () => {
             adetails[account.email].status = true
-            settingsWin.webContents.send('mailcord:status', account.email, true)
+            if (settingsWin) settingsWin.webContents.send('mailcord:status', account.email, true)
             notif('Email Connected', `Notifier for ${account.email} has successfully connected`)
         })
         accs[account.email].on('mail', async (mail) => {
@@ -142,7 +142,7 @@ async function startNotifier(accounts) {
         //accs[account.email].on('end', () => accs[account.email].start())
         accs[account.email].on('error', (e) => {
             adetails[account.email].status = false
-            settingsWin.webContents.send('mailcord:status', account.email, false)
+            if (settingsWin) settingsWin.webContents.send('mailcord:status', account.email, false)
             notif('Error', e.message)
         })
         accs[account.email].start()

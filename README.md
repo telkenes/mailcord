@@ -6,6 +6,11 @@ An email client which sends emails to a discord channel through a webhook
 - run `npm install`
 - run `npm start`
 
+## Compiling the application yourself
+- install the npm packages
+- install electron-forge globally 
+- run `electron-forge make --platform=platform` (replace platform with win32, darwin, or linux)
+
 ## Installation and setup
 - Install it :) (idk how this works ok)
 - This package has only been tested with a gmail account
