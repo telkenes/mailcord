@@ -97,7 +97,7 @@ async function startup() {
 
 async function startNotifier(accounts) {
     Object.keys(accs).forEach(key => {
-        accs[key].stop()
+        delete accs[key]
     })
 
     accounts.forEach((account, index) => {
@@ -139,7 +139,7 @@ async function startNotifier(accounts) {
                 }
             })
         })
-        //accs[account.email].on('end', () => accs[account.email].start())
+        accs[account.email].on('end', () => accs[account.email].start())
         accs[account.email].on('error', (e) => {
             adetails[account.email].status = false
             if (settingsWin) settingsWin.webContents.send('mailcord:status', account.email, false)
