@@ -103,6 +103,7 @@ async function startNotifier(accounts) {
     accounts.forEach((account, index) => {
         adetails[account.email] = {}
         adetails[account.email].status = 'unknown'
+        adetails[account.email].init = true
         let info = {
             user: account.email,
             password: account.password,
@@ -117,7 +118,8 @@ async function startNotifier(accounts) {
         accs[account.email].on('connected', () => {
             adetails[account.email].status = true
             if (settingsWin) settingsWin.webContents.send('mailcord:status', account.email, true)
-            notif('Email Connected', `Notifier for ${account.email} has successfully connected`)
+            if (adetails[account.email].init) notif('Email Connected', `Notifier for ${account.email} has successfully connected`)
+            adetails[account.email].init = false
         })
         accs[account.email].on('mail', async (mail) => {
             let embed = {
@@ -139,10 +141,22 @@ async function startNotifier(accounts) {
                 }
             })
         })
-        accs[account.email].on('end', () => accs[account.email].start())
+        accs[account.email].on('end', () => {
+            adetails[account.email].status = 'unknown'
+            notif('Reconnecting', '...')
+            accs[account.email].start()
+        })
+        
         accs[account.email].on('error', (e) => {
             adetails[account.email].status = false
             if (settingsWin) settingsWin.webContents.send('mailcord:status', account.email, false)
+            //some magic to reconnect?
+            if (e.code === 'ECONNRESET' || e.code === 'ETIMEDOUT') {
+                adetails[account.email].status = 'unknown'
+                adetails[account.email].init = false
+                setTimeout(() =>{ accs[account.email].stop(); accs[account.email].start(); }, 5000);
+                return
+            }
             notif('Error', e.message)
         })
         accs[account.email].start()
