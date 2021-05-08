@@ -1,4 +1,4 @@
-const { app, Menu, Tray, BrowserWindow, globalShortcut, clipboard, ipcMain, nativeImage, TouchBarLabel } = require('electron')
+const { app, Menu, Tray, BrowserWindow, globalShortcut, clipboard, ipcMain, nativeImage, TouchBarLabel, NativeImage } = require('electron')
 const crypto = require('crypto-js')
 const phin = require('phin')
 const settings = require('electron-settings');
@@ -26,6 +26,7 @@ async function openSetup() {
     setupWin = new BrowserWindow({
         show: true,
         title: "Mailcord - Setup",
+        icon: new NativeImage('./assets/icons/icon512.png'),
         width: 600,
         height: 500,
         resizeable: false,
@@ -51,6 +52,7 @@ async function openSettings() {
     settingsWin = new BrowserWindow({
         show: true,
         title: "Mailcord - Settings",
+        icon: new NativeImage('./assets/icons/icon512.png'),
         width: 600,
         height: 500,
         resizeable: false,
